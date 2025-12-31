@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sipaten_app
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      # DB akan ngikut .env kamu juga, tapi ini bantu kalau mau override cepat
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: sipaten
+      DB_USERNAME: sipaten
+      DB_PASSWORD: sipaten
+    volumes:
+      # Untuk dev: biar edit code langsung ke-container
+      - ./:/var/www/html
+      # Biar vendor hasil build tidak ketimpa volume kosong (opsional, tapi bagus)
+      - /var/www/html/vendor
+      # Log & cache
+      - /var/www/html/storage
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: sipaten_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: sipaten_db
+    environment:
+      MYSQL_DATABASE: sipaten
+      MYSQL_USER: sipaten
+      MYSQL_PASSWORD: sipaten
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - sipaten_mysql:/var/lib/mysql
+
+volumes:
+  sipaten_mysql:
