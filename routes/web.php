@@ -14,6 +14,7 @@ use App\Http\Controllers\SkpController;
 use App\Http\Controllers\Leader\EvaluationController;
 use App\Http\Controllers\Employee\VotingController;
 use App\Http\Controllers\Admin\RecapController;
+use App\Http\Controllers\Auth\SsoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('monitoring')->name('monitoring.')->middleware(['role:Admin|Kepala BPS'])->group(function () {
         Route::get('/{period}', [AssignmentController::class, 'monitoring'])->name('show');
     });
+
+    Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
+    Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
+    Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
 });
 
 require __DIR__ . '/auth.php';
