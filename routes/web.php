@@ -23,7 +23,11 @@ use App\Http\Controllers\Auth\SsoController;
 */
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('sso.redirect');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -90,7 +94,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
     Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
-    Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
+    Route::middleware('auth')->post('/logout', [SsoController::class, 'logout'])->name('logout');
 });
 
 require __DIR__ . '/auth.php';

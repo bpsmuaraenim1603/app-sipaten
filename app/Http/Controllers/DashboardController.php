@@ -15,9 +15,9 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // Jika user tidak ada (kasus aneh), tampilkan halaman login
-        if (!$user) {
-            return redirect()->route('login');
-        }
+        // if (!$user) {
+        //     return redirect()->route('login');
+        // }
 
         // Jika Admin, tampilkan dashboard admin
         if ($user->hasRole('Admin')) {
