@@ -22,6 +22,9 @@ use App\Http\Controllers\Auth\SsoController;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
+Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
+
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
@@ -92,8 +95,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/{period}', [AssignmentController::class, 'monitoring'])->name('show');
     });
 
-    Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
-    Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
     Route::middleware('auth')->post('/logout', [SsoController::class, 'logout'])->name('logout');
 });
 

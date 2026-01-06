@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // --- TAMBAHKAN BARIS INI ---
         $middleware->trustProxies(at: '*');
+        $middleware->redirectGuestsTo(fn () => route('sso.redirect'));
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
