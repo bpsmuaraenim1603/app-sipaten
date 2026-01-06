@@ -81,29 +81,26 @@ class SsoController extends Controller
             ]);
         }
 
-        $pegawai = $api->getUserByUsername($username);
+        $pegawai = app(BpsPegawaiApi::class)->getPegawai($username, $email);
+
         if (is_array($pegawai)) {
             $attr = $pegawai['attributes'] ?? [];
 
-            $pegawai = $api->getUserByUsername($username);
-            if (is_array($pegawai)) {
-                $attr = $pegawai['attributes'] ?? [];
+            $user->fill([
+                'nip' => $attr['attribute-nip'][0] ?? $user->nip,
+                'jabatan' => $attr['attribute-jabatan'][0] ?? $user->jabatan,
+                'eselon' => $attr['attribute-eselon'][0] ?? $user->eselon,
+                'golongan' => $attr['attribute-golongan'][0] ?? $user->golongan,
+                'foto_url' => $attr['attribute-foto'][0] ?? $user->foto_url,
 
-                $user->fill([
-                    'nip' => $attr['attribute-nip'][0] ?? $user->nip,
-                    'jabatan' => $attr['attribute-jabatan'][0] ?? $user->jabatan,
-                    'eselon' => $attr['attribute-eselon'][0] ?? $user->eselon,
-                    'golongan' => $attr['attribute-golongan'][0] ?? $user->golongan,
-                    'foto_url' => $attr['attribute-foto'][0] ?? $user->foto_url,
+                // opsional (kalau kolom ada)
+                'satker' => $attr['attribute-organisasi'][0] ?? $user->satker,      // kode organisasi
+                'unit_kerja' => $attr['attribute-kabupaten'][0] ?? $user->unit_kerja,   // dari data kamu ada "Kab. Muara Enim"
 
-                    'satker' => $attr['attribute-organisasi'][0] ?? $user->satker,      // kode organisasi
-                    'unit_kerja' => $attr['attribute-kabupaten'][0] ?? $user->unit_kerja,   // contoh paling aman dari data kamu
-
-                    'pegawai_raw' => json_encode($pegawai, JSON_UNESCAPED_UNICODE),
-                ])->save();
-            }
-
+                'pegawai_raw' => json_encode($pegawai, JSON_UNESCAPED_UNICODE),
+            ])->save();
         }
+
 
         if (method_exists($user, 'hasAnyRole') && !$user->hasAnyRole(['Admin', 'Kepala BPS', 'Bagian Umum', 'Pegawai'])) {
             $user->assignRole('Pegawai');
