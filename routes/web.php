@@ -22,11 +22,26 @@ use App\Http\Controllers\Admin\RecapController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
+Route::get('/debug/bps-api', function () {
+    abort_unless(config('app.debug'), 404);
+
+    $u = request('u', 'hamamhadinata');
+    $e = request('e', $u.'@bps.go.id');
+
+    try {
+        $svc = app(\App\Services\BpsPegawaiApi::class);
+        return response()->json([
+            'username_test' => $u,
+            'email_test' => $e,
+            'by_username' => $svc->byUsername($u),
+            'by_email' => $svc->byEmail($e),
+        ]);
+    } catch (\Throwable $ex) {
+        return response()->json([
+            'error' => $ex->getMessage(),
+        ], 500);
+    }
 });
-
-
 
 Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');

@@ -16,10 +16,10 @@ class SsoController extends Controller
     {
         return new Keycloak([
             'authServerUrl' => config('services.bps_sso.base_url'),
-            'realm'         => config('services.bps_sso.realm'),
-            'clientId'      => config('services.bps_sso.client_id'),
-            'clientSecret'  => config('services.bps_sso.client_secret'),
-            'redirectUri'   => config('services.bps_sso.redirect_uri'),
+            'realm' => config('services.bps_sso.realm'),
+            'clientId' => config('services.bps_sso.client_id'),
+            'clientSecret' => config('services.bps_sso.client_secret'),
+            'redirectUri' => config('services.bps_sso.redirect_uri'),
         ]);
     }
 
@@ -56,9 +56,9 @@ class SsoController extends Controller
         $owner = $provider->getResourceOwner($token);
 
         $username = $owner->getUsername();
-        $name     = $owner->getName() ?? $username;
-        $nip      = method_exists($owner, 'getNip') ? $owner->getNip() : null;
-        $email    = $owner->getEmail();
+        $name = $owner->getName() ?? $username;
+        $nip = method_exists($owner, 'getNip') ? $owner->getNip() : null;
+        $email = $owner->getEmail();
 
         $user = User::where('username', $username)
             ->orWhere('email', $email)
@@ -67,16 +67,16 @@ class SsoController extends Controller
         if ($user) {
             $user->fill([
                 'username' => $username,
-                'name'     => $name,
-                'email'    => $email,
-                'nip'      => $nip ?: $user->nip,
+                'name' => $name,
+                'email' => $email,
+                'nip' => $nip ?: $user->nip,
             ])->save();
         } else {
             $user = User::create([
                 'username' => $username,
-                'name'     => $name,
-                'email'    => $email,
-                'nip'      => $nip,
+                'name' => $name,
+                'email' => $email,
+                'nip' => $nip,
                 'password' => bcrypt(Str::random(32)),
             ]);
         }
@@ -85,16 +85,24 @@ class SsoController extends Controller
         if (is_array($pegawai)) {
             $attr = $pegawai['attributes'] ?? [];
 
-            $user->fill([
-                'jabatan'     => $attr['jabatan'][0] ?? $attr['jabatan_fungsional'][0] ?? $user->jabatan,
-                'eselon'      => $attr['eselon'][0] ?? $user->eselon,
-                'unit_kerja'  => $attr['unit_kerja'][0] ?? $attr['unitKerja'][0] ?? $user->unit_kerja,
-                'satker'      => $attr['satker'][0] ?? $user->satker,
-                'golongan'    => $attr['golongan'][0] ?? $user->golongan,
-                'pangkat'     => $attr['pangkat'][0] ?? $user->pangkat,
-                'foto_url'    => $attr['foto'][0] ?? $attr['photo'][0] ?? $user->foto_url,
-                'pegawai_raw' => json_encode($pegawai, JSON_UNESCAPED_UNICODE),
-            ])->save();
+            $pegawai = $api->getUserByUsername($username);
+            if (is_array($pegawai)) {
+                $attr = $pegawai['attributes'] ?? [];
+
+                $user->fill([
+                    'nip' => $attr['attribute-nip'][0] ?? $user->nip,
+                    'jabatan' => $attr['attribute-jabatan'][0] ?? $user->jabatan,
+                    'eselon' => $attr['attribute-eselon'][0] ?? $user->eselon,
+                    'golongan' => $attr['attribute-golongan'][0] ?? $user->golongan,
+                    'foto_url' => $attr['attribute-foto'][0] ?? $user->foto_url,
+
+                    'satker' => $attr['attribute-organisasi'][0] ?? $user->satker,      // kode organisasi
+                    'unit_kerja' => $attr['attribute-kabupaten'][0] ?? $user->unit_kerja,   // contoh paling aman dari data kamu
+
+                    'pegawai_raw' => json_encode($pegawai, JSON_UNESCAPED_UNICODE),
+                ])->save();
+            }
+
         }
 
         if (method_exists($user, 'hasAnyRole') && !$user->hasAnyRole(['Admin', 'Kepala BPS', 'Bagian Umum', 'Pegawai'])) {

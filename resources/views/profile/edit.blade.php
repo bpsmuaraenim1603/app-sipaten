@@ -38,10 +38,6 @@
                             <div><span class="font-medium">Golongan:</span> {{ auth()->user()->golongan ?? '-' }}</div>
                             <div><span class="font-medium">Pangkat:</span> {{ auth()->user()->pangkat ?? '-' }}</div>
                         </div>
-
-                        <p class="text-xs text-gray-500 pt-2">
-                            Data profil ditarik otomatis dari SSO/API Pegawai. Jika ada yang tidak sesuai, biasanya perlu pembaruan data di sumber SSO.
-                        </p>
                     </div>
                 </div>
             </div>
