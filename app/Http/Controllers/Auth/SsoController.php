@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\BpsPegawaiApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -34,7 +35,7 @@ class SsoController extends Controller
         return redirect()->away($authUrl);
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request, BpsPegawaiApi $api)
     {
         $state = $request->session()->pull('oauth2state');
 
@@ -55,18 +56,50 @@ class SsoController extends Controller
         $owner = $provider->getResourceOwner($token);
 
         $username = $owner->getUsername();
-        $name     = $owner->getName();
-        $nip      = $owner->getNip();
+        $name     = $owner->getName() ?? $username;
+        $nip      = method_exists($owner, 'getNip') ? $owner->getNip() : null;
         $email    = $owner->getEmail();
 
-        $user = User::updateOrCreate(
-            ['username' => $username],
-            [
-                'name'  => $name ?? $username,
-                'email' => $email,
+        $user = User::where('username', $username)
+            ->orWhere('email', $email)
+            ->first();
+
+        if ($user) {
+            $user->fill([
+                'username' => $username,
+                'name'     => $name,
+                'email'    => $email,
+                'nip'      => $nip ?: $user->nip,
+            ])->save();
+        } else {
+            $user = User::create([
+                'username' => $username,
+                'name'     => $name,
+                'email'    => $email,
+                'nip'      => $nip,
                 'password' => bcrypt(Str::random(32)),
-            ]
-        );
+            ]);
+        }
+
+        $pegawai = $api->getUserByUsername($username);
+        if (is_array($pegawai)) {
+            $attr = $pegawai['attributes'] ?? [];
+
+            $user->fill([
+                'jabatan'     => $attr['jabatan'][0] ?? $attr['jabatan_fungsional'][0] ?? $user->jabatan,
+                'eselon'      => $attr['eselon'][0] ?? $user->eselon,
+                'unit_kerja'  => $attr['unit_kerja'][0] ?? $attr['unitKerja'][0] ?? $user->unit_kerja,
+                'satker'      => $attr['satker'][0] ?? $user->satker,
+                'golongan'    => $attr['golongan'][0] ?? $user->golongan,
+                'pangkat'     => $attr['pangkat'][0] ?? $user->pangkat,
+                'foto_url'    => $attr['foto'][0] ?? $attr['photo'][0] ?? $user->foto_url,
+                'pegawai_raw' => json_encode($pegawai, JSON_UNESCAPED_UNICODE),
+            ])->save();
+        }
+
+        if (method_exists($user, 'hasAnyRole') && !$user->hasAnyRole(['Admin', 'Kepala BPS', 'Bagian Umum', 'Pegawai'])) {
+            $user->assignRole('Pegawai');
+        }
 
         Auth::login($user, true);
 
@@ -79,6 +112,6 @@ class SsoController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('sso.redirect');
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\SsoController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\PeriodController;
 use App\Http\Controllers\Admin\QuestionController;
@@ -14,7 +15,6 @@ use App\Http\Controllers\SkpController;
 use App\Http\Controllers\Leader\EvaluationController;
 use App\Http\Controllers\Employee\VotingController;
 use App\Http\Controllers\Admin\RecapController;
-use App\Http\Controllers\Auth\SsoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,26 +22,26 @@ use App\Http\Controllers\Auth\SsoController;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+
+
 Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
 
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-
-    return redirect()->route('sso.redirect');
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('sso.redirect');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // --- RUTE KHUSUS ADMIN ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');    // --- RUTE KHUSUS ADMIN ---
     Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('periods', PeriodController::class);
@@ -94,8 +94,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('monitoring')->name('monitoring.')->middleware(['role:Admin|Kepala BPS'])->group(function () {
         Route::get('/{period}', [AssignmentController::class, 'monitoring'])->name('show');
     });
-
-    Route::middleware('auth')->post('/logout', [SsoController::class, 'logout'])->name('logout');
 });
 
 require __DIR__ . '/auth.php';

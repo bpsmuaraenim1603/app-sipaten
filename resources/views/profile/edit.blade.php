@@ -1,52 +1,63 @@
 <x-main-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
+            Profil
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <div class="p-6 bg-white shadow sm:rounded-lg">
+                <div class="flex items-start gap-6">
+                    <div class="shrink-0">
+                        @if(auth()->user()->foto_url)
+                            <img src="{{ auth()->user()->foto_url }}" alt="Foto Profil"
+                                 class="w-24 h-24 rounded-full object-cover border" />
+                        @else
+                            <div class="w-24 h-24 rounded-full bg-gray-100 border flex items-center justify-center text-gray-500">
+                                N/A
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex-1 space-y-2">
+                        <div class="text-lg font-semibold text-gray-900">{{ auth()->user()->name }}</div>
+                        <div class="text-sm text-gray-600">@{{ auth()->user()->username }}</div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 text-sm">
+                            <div><span class="font-medium">NIP:</span> {{ auth()->user()->nip ?? '-' }}</div>
+                            <div><span class="font-medium">Email:</span> {{ auth()->user()->email ?? '-' }}</div>
+
+                            <div><span class="font-medium">Jabatan:</span> {{ auth()->user()->jabatan ?? '-' }}</div>
+                            <div><span class="font-medium">Eselon:</span> {{ auth()->user()->eselon ?? '-' }}</div>
+
+                            <div><span class="font-medium">Unit Kerja:</span> {{ auth()->user()->unit_kerja ?? '-' }}</div>
+                            <div><span class="font-medium">Satker:</span> {{ auth()->user()->satker ?? '-' }}</div>
+
+                            <div><span class="font-medium">Golongan:</span> {{ auth()->user()->golongan ?? '-' }}</div>
+                            <div><span class="font-medium">Pangkat:</span> {{ auth()->user()->pangkat ?? '-' }}</div>
+                        </div>
+
+                        <p class="text-xs text-gray-500 pt-2">
+                            Data profil ditarik otomatis dari SSO/API Pegawai. Jika ada yang tidak sesuai, biasanya perlu pembaruan data di sumber SSO.
+                        </p>
+                    </div>
                 </div>
             </div>
 
+            <div class="p-6 bg-white shadow sm:rounded-lg">
+                <h3 class="text-base font-semibold text-gray-900">Keluar</h3>
+                <p class="text-sm text-gray-600 mt-1">Logout dari SIPATEN (SSO masih bisa tetap login di browser).</p>
 
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            
-
-            <!-- <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div> -->
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <h2 class="text-lg font-medium text-gray-900">
+                <form method="POST" action="{{ route('logout') }}" class="mt-4">
+                    @csrf
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                         Log Out
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-600">
-                        Keluar dari sesi Anda saat ini.
-                    </p>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-6">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Log Out
-                        </button>
-                    </form>
-                </div>
+                    </button>
+                </form>
             </div>
-
 
         </div>
     </div>
