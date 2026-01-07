@@ -43,11 +43,15 @@ return [
     ],
 
     'bps_sso' => [
-        'base_url'      => env('SSO_BASE_URL', 'https://sso.bps.go.id'),
-        'realm'         => env('SSO_REALM', 'pegawai-bps'),
-        'scope'         => env('SSO_SCOPE', 'openid profile-pegawai'),
-        'client_id'     => env('SSO_CLIENT_ID'),
+        'base_url' => env('SSO_BASE_URL', 'https://sso.bps.go.id'),
+        'realm' => env('SSO_REALM', 'pegawai-bps'),
+        'scope' => env('SSO_SCOPE', 'openid profile-pegawai'),
+        'client_id' => env('SSO_CLIENT_ID'),
         'client_secret' => env('SSO_CLIENT_SECRET'),
-        'redirect_uri'  => env('SSO_REDIRECT_URI'),
+        'redirect_uri' => env('SSO_REDIRECT_URI'),
+    ],
+
+    'bps_access' => [
+        'allowed_kabupaten' => explode('|', env('ALLOWED_KABUPATEN', 'Kab. Muara Enim')),
     ],
 ];

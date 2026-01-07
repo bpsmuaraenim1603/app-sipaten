@@ -30,13 +30,10 @@
                             <div><span class="font-medium">Email:</span> {{ auth()->user()->email ?? '-' }}</div>
 
                             <div><span class="font-medium">Jabatan:</span> {{ auth()->user()->jabatan ?? '-' }}</div>
-                            <div><span class="font-medium">Eselon:</span> {{ auth()->user()->eselon ?? '-' }}</div>
-
                             <div><span class="font-medium">Unit Kerja:</span> {{ auth()->user()->unit_kerja ?? '-' }}</div>
-                            <div><span class="font-medium">Satker:</span> {{ auth()->user()->satker ?? '-' }}</div>
 
+                            <div><span class="font-medium">Satker:</span> {{ auth()->user()->satker ?? '-' }}</div>
                             <div><span class="font-medium">Golongan:</span> {{ auth()->user()->golongan ?? '-' }}</div>
-                            <div><span class="font-medium">Pangkat:</span> {{ auth()->user()->pangkat ?? '-' }}</div>
                         </div>
                     </div>
                 </div>

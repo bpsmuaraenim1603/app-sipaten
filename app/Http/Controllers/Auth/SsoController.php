@@ -53,6 +53,10 @@ class SsoController extends Controller
             'code' => $request->string('code')->toString(),
         ]);
 
+        session([
+            'id_token' => $tokenResponse['id_token'] ?? null,
+        ]);
+
         $owner = $provider->getResourceOwner($token);
 
         $username = $owner->getUsername();
@@ -83,17 +87,27 @@ class SsoController extends Controller
 
         $pegawai = app(BpsPegawaiApi::class)->getPegawai($username, $email);
 
+        $attr = $pegawai['attributes'] ?? [];
+        $kabupaten = $attr['attribute-kabupaten'][0] ?? null;
+
+        $allowed = array_map('trim', config('services.bps_access.allowed_kabupaten', ['Kab. Muara Enim']));
+
+        if (!$kabupaten || !in_array($kabupaten, $allowed, true)) {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            return redirect('/blocked')->with('error', 'Akses ditolak: hanya untuk pegawai BPS Kab. Muara Enim.');
+        }
+
         if (is_array($pegawai)) {
             $attr = $pegawai['attributes'] ?? [];
 
             $user->fill([
                 'nip' => $attr['attribute-nip'][0] ?? $user->nip,
                 'jabatan' => $attr['attribute-jabatan'][0] ?? $user->jabatan,
-                'eselon' => $attr['attribute-eselon'][0] ?? $user->eselon,
                 'golongan' => $attr['attribute-golongan'][0] ?? $user->golongan,
                 'foto_url' => $attr['attribute-foto'][0] ?? $user->foto_url,
-
-                // opsional (kalau kolom ada)
                 'satker' => $attr['attribute-organisasi'][0] ?? $user->satker,      // kode organisasi
                 'unit_kerja' => $attr['attribute-kabupaten'][0] ?? $user->unit_kerja,   // dari data kamu ada "Kab. Muara Enim"
 
@@ -117,6 +131,21 @@ class SsoController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('sso.redirect');
+        $idToken = $request->session()->get('id_token');
+
+        $logoutUrl = config('services.bps_sso.base_url')
+            . '/auth/realms/'
+            . config('services.bps_sso.realm')
+            . '/protocol/openid-connect/logout';
+
+        $params = [
+            'post_logout_redirect_uri' => url('/'),
+        ];
+
+        if ($idToken) {
+            $params['id_token_hint'] = $idToken;
+        }
+
+        return redirect()->away($logoutUrl . '?' . http_build_query($params));
     }
 }

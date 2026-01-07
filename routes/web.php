@@ -26,7 +26,7 @@ Route::get('/debug/bps-api', function () {
     abort_unless(config('app.debug'), 404);
 
     $u = request('u', 'hamamhadinata');
-    $e = request('e', $u.'@bps.go.id');
+    $e = request('e', $u . '@bps.go.id');
 
     try {
         $svc = app(\App\Services\BpsPegawaiApi::class);
@@ -45,7 +45,7 @@ Route::get('/debug/bps-api', function () {
 
 Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
-
+Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
@@ -112,3 +112,8 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
+Route::get('/blocked', function () {
+    return response()->view('blocked', [], 403);
+})->name('blocked');
