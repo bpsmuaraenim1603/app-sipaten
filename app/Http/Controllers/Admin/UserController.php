@@ -41,7 +41,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'nip' => 'nullable|string|max:20|unique:users',
             'jabatan' => 'nullable|string|max:255',
-            'role' => 'required'
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ]); // Atur validasi di sini
 
         $user = User::create([
@@ -54,7 +55,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->assignRole($request->role);
+        $user->assignRole($request->roles);
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat.');
     }
@@ -83,12 +84,13 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,'.$user->id,
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'nip' => 'nullable|string|max:20|unique:users,nip,' . $user->id,
             'jabatan' => 'nullable|string|max:255',
-            'role' => 'required'
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ]);
 
         $input = $request->except(['password']);
@@ -101,7 +103,7 @@ class UserController extends Controller
         $input['username'] = $request->username;
 
         $user->update($input);
-        $user->syncRoles($request->role);
+        $user->syncRoles($request->roles);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil diperbarui.');

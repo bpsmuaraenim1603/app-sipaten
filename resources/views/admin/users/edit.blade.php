@@ -53,27 +53,28 @@
                             </div>
 
                             <!-- Password (Opsional) -->
-                            <div>
+                            <!-- <div>
                                 <label for="password" class="block font-medium text-sm text-gray-700">Password Baru (kosongkan jika tidak diubah)</label>
                                 <input type="password" name="password" id="password" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 ...">
-                            </div>
+                            </div> -->
 
                             <!-- Konfirmasi Password -->
-                            <div>
+                            <!-- <div>
                                 <label for="password_confirmation" class="block font-medium text-sm text-gray-700">Konfirmasi Password Baru</label>
                                 <input type="password" name="password_confirmation" id="password_confirmation" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 ...">
-                            </div>
+                            </div> -->
 
                             <!-- Role -->
                             <div>
-                                <label for="role" class="block font-medium text-sm text-gray-700">Role</label>
-                                <select name="role" id="role" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 ..." required>
+                                <label for="roles" class="block font-medium text-sm text-gray-700">Role</label>
+                                <select name="roles[]" id="roles" multiple required class="block mt-1 w-full rounded-md shadow-sm border-gray-300 ...">
                                     @foreach($roles as $role)
                                     <option value="{{ $role }}" {{ $user->hasRole($role) ? 'selected' : '' }}>
                                         {{ $role }}
                                     </option>
                                     @endforeach
                                 </select>
+                                <span>Tekan Ctrl / Cmd untuk pilih lebih dari satu role</span>
                             </div>
 
                             <!-- Checkbox Ketua Tim -->

@@ -52,26 +52,27 @@
                             </div>
 
                             <!-- Password -->
-                            <div>
+                            <!-- <div>
                                 <label for="password" class="block font-medium text-sm text-gray-700">Password</label>
                                 <input type="password" name="password" id="password" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                            </div>
+                            </div> -->
 
                             <!-- Konfirmasi Password -->
-                            <div>
+                            <!-- <div>
                                 <label for="password_confirmation" class="block font-medium text-sm text-gray-700">Konfirmasi Password</label>
                                 <input type="password" name="password_confirmation" id="password_confirmation" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                            </div>
+                            </div> -->
 
                             <!-- Role -->
                             <div>
-                                <label for="role" class="block font-medium text-sm text-gray-700">Role</label>
-                                <select name="role" id="role" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <label for="roles" class="block font-medium text-sm text-gray-700">Role</label>
+                                <select name="roles[]" id="roles" multiple required class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                     <option value="">Pilih Role</option>
                                     @foreach($roles as $role)
                                         <option value="{{ $role }}">{{ $role }}</option>
                                     @endforeach
                                 </select>
+                                <span>Tekan Ctrl / Cmd untuk pilih lebih dari satu role</span>
                             </div>
 
                             <!-- Checkbox Ketua Tim -->
