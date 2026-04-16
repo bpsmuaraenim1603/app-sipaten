@@ -1,3 +1,19 @@
+<div class="flex flex-col items-center justify-center py-6 mb-2 border-b border-gray-700/50">
+    <img src="{{ asset('images/logo.png') }}" alt="Logo BPS" class="h-20 w-auto mb-3">
+    <div class="flex items-center">
+        <span class="text-2xl font-bold tracking-wider text-white">
+            <span class="text-blue-400">SI</span>P<span class="text-green-500">A</span>TEN
+        </span>
+    </div>
+</div>
+
+<ul class="space-y-2 font-medium">
+    <li>
+        <a href="{{ route('dashboard') }}" class="...">
+            ...
+        </a>
+    </li>
+    ...
 <ul class="space-y-2 font-medium">
 
     <!-- Dashboard (Semua Role) -->

@@ -45,11 +45,10 @@ Route::get('/debug/bps-api', function () {
 
 Route::get('/login/sso', [SsoController::class, 'redirect'])->name('sso.redirect');
 Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
-Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
-        : redirect()->route('sso.redirect');
+        : redirect()->route('login');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -113,7 +112,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-Route::post('/logout', [SsoController::class, 'logout'])->name('logout');
 Route::get('/blocked', function () {
     return response()->view('blocked', [], 403);
 })->name('blocked');
