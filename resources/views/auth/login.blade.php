@@ -4,7 +4,7 @@
             Selamat Datang
         </h2>
         <p class="text-blue-100 mb-8">
-            Silahkan masuk melalui akun yang tersedia atau dengan menggunakan akus SSO BPS.
+            Silahkan masuk melalui akun SSO yang tersedia.
         </p>
 
         <x-auth-session-status class="mb-4" :status="session('status')" />
