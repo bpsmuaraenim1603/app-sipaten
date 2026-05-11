@@ -55,7 +55,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');    // --- RUTE KHUSUS ADMIN ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
+        // --- RUTE KHUSUS ADMIN ---
     Route::middleware(['role:Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('periods', PeriodController::class);

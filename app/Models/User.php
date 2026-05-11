@@ -19,22 +19,22 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-    'name',
-    'username',
-    'email',
-    'password',
-    'nip',
-    'jabatan',
-    'eselon',
-    'unit_kerja',
-    'satker',
-    'golongan',
-    'pangkat',
-    'foto_url',
-    'pegawai_raw',
-    'is_ketua_tim',
-    'profile_photo_path',
-];
+        'name',
+        'username',
+        'email',
+        'password',
+        'nip',
+        'jabatan',
+        'eselon',
+        'unit_kerja',
+        'satker',
+        'golongan',
+        'pangkat',
+        'foto_url',
+        'pegawai_raw',
+        'is_ketua_tim',
+        'profile_photo_path',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -67,5 +67,18 @@ class User extends Authenticatable
     public function assignmentsAsVoter()
     {
         return $this->hasMany(Assignment::class, 'voter_id');
+    }
+
+    public function getDisplayPhotoUrlAttribute(): string
+    {
+        if ($this->profile_photo_path) {
+            return \Illuminate\Support\Facades\Storage::url($this->profile_photo_path);
+        }
+
+        if ($this->foto_url) {
+            return $this->foto_url;
+        }
+
+        return asset('images/default-avatar.png');
     }
 }
